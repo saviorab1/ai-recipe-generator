@@ -4,6 +4,8 @@ frontend:
     preBuild:
       commands:
         - cd ai-gen-web
+        - nvm use 18.19.0 || nvm install 18.19.0
+        - node -v
         - yarn install
     build:
       commands:
