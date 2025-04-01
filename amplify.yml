@@ -1,0 +1,17 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd ai-gen-web
+        - yarn install
+    build:
+      commands:
+        - yarn build
+  artifacts:
+    baseDirectory: ai-gen-web/dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - ai-gen-web/node_modules/**/* 
