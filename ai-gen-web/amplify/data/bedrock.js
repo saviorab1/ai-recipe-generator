@@ -1,16 +1,13 @@
 export function request(ctx) {
-  const { ingredients = [] } = ctx.args;
+  const { imageBase64, question } = ctx.args;
 
-  // Construct the prompt with the provided ingredients
-  const prompt = `Suggest a recipe idea using these ingredients: ${ingredients.join(", ")}.`;
-
-  // Return the request configuration
   return {
     resourcePath: `/model/anthropic.claude-3-sonnet-20240229-v1:0/invoke`,
     method: "POST",
     params: {
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json"
       },
       body: JSON.stringify({
         anthropic_version: "bedrock-2023-05-31",
@@ -20,24 +17,28 @@ export function request(ctx) {
             role: "user",
             content: [
               {
-                type: "text",
-                text: `\n\nHuman: ${prompt}\n\nAssistant:`,
+                type: "image",
+                source: {
+                  type: "base64",
+                  media_type: "image/jpeg",
+                  data: imageBase64
+                }
               },
-            ],
-          },
-        ],
+              {
+                type: "text",
+                text: question || "What's in this image?"
+              }
+            ]
+          }
+        ]
       }),
     },
   };
 }
 
 export function response(ctx) {
-  // Parse the response body
   const parsedBody = JSON.parse(ctx.result.body);
-  // Extract the text content from the response
-  const res = {
-    body: parsedBody.content[0].text,
+  return {
+    body: parsedBody.content[0].text
   };
-  // Return the response
-  return res;
 }
