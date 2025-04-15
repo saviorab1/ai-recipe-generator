@@ -11,6 +11,7 @@ export function request(ctx) {
     params: {
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json"
       },
       body: JSON.stringify({
         anthropic_version: "bedrock-2023-05-31",

@@ -2,13 +2,13 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 const schema = a.schema({
   BedrockResponse: a.customType({
-    body: a.string(),
+    body: a.string().required(),
     error: a.string(),
   }),
 
   askBedrock: a
     .query()
-    .arguments({ ingredients: a.string().array() })
+    .arguments({ ingredients: a.string().array().required() })
     .returns(a.ref("BedrockResponse"))
     .authorization((allow) => [allow.authenticated()])
     .handler(
