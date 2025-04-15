@@ -22,9 +22,8 @@ const bedrockDataSource = backend.data.resources.graphqlApi.addHttpDataSource(
 bedrockDataSource.grantPrincipal.addToPrincipalPolicy(
   new PolicyStatement({
     resources: [
-      "arn:aws:bedrock:ap-southeast-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0",
+      "arn:aws:bedrock:ap-southeast-1::foundation-model/anthropic.claude-v2",
     ],
     actions: ["bedrock:InvokeModel"],
-    
   })
 );
