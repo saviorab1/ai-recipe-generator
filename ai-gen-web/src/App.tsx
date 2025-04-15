@@ -26,11 +26,12 @@ function App() {
     try {
       const formData = new FormData(event.currentTarget);
       const ingredientsString = formData.get("ingredients")?.toString() || "";
-      // Split the ingredients by comma and trim whitespace
       const ingredientsList = ingredientsString.split(',').map(i => i.trim()).filter(i => i.length > 0);
       
       const { data, errors } = await amplifyClient.queries.askBedrock({
         ingredients: ingredientsList,
+        imageBase64: "",
+        question: ""
       });
 
       if (!errors) {

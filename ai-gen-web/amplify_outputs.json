@@ -68,6 +68,13 @@
           },
           "isRequired": false,
           "arguments": {
+            "ingredients": {
+              "name": "ingredients",
+              "isArray": true,
+              "type": "String",
+              "isRequired": false,
+              "isArrayNullable": false
+            },
             "imageBase64": {
               "name": "imageBase64",
               "isArray": false,
