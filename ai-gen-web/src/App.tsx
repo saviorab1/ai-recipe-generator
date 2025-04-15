@@ -25,31 +25,23 @@ function App() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const imageInput = formData.get("image") as File;
-      const question = formData.get("question") as string;
-
-      // Convert image to base64
-      const imageBase64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          resolve(base64String.split(',')[1]); // Remove the data URL prefix
-        };
-        reader.readAsDataURL(imageInput);
-      });
-
+      const ingredientsString = formData.get("ingredients")?.toString() || "";
+      // Split the ingredients by comma and trim whitespace
+      const ingredientsList = ingredientsString.split(',').map(i => i.trim()).filter(i => i.length > 0);
+      
       const { data, errors } = await amplifyClient.queries.askBedrock({
-        imageBase64,
-        question: question || "What's in this image?"
+        ingredients: ingredientsList,
       });
 
-      if (errors) {
-        setResult(`Error: ${errors.map(e => e.message).join(', ')}`);
+      if (!errors) {
+        setResult(data?.body || "No data returned");
       } else {
-        setResult(data?.body || "No response received");
+        console.error(errors);
+        setResult("An error occurred while generating the recipe");
       }
     } catch (e) {
-      setResult(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      console.error(e);
+      setResult("An error occurred while generating the recipe");
     } finally {
       setLoading(false);
     }
