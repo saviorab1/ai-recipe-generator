@@ -37,8 +37,34 @@ export function request(ctx) {
 }
 
 export function response(ctx) {
-  const parsedBody = JSON.parse(ctx.result.body);
-  return {
-    body: parsedBody.content[0].text
-  };
+  try {
+    const parsedBody = JSON.parse(ctx.result.body);
+    
+    // Handle potential error responses
+    if (parsedBody.error) {
+      return {
+        body: "",
+        error: parsedBody.error.message || JSON.stringify(parsedBody.error)
+      };
+    }
+
+    // Handle successful responses
+    if (parsedBody.content && Array.isArray(parsedBody.content)) {
+      return {
+        body: parsedBody.content[0]?.text || "No response text available",
+        error: ""
+      };
+    }
+
+    // Handle unexpected response format
+    return {
+      body: "",
+      error: "Unexpected response format from Claude"
+    };
+  } catch (error) {
+    return {
+      body: "",
+      error: `Error processing response: ${error.message}`
+    };
+  }
 }

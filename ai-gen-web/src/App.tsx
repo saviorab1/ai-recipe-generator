@@ -25,20 +25,31 @@ function App() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      
-      const { data, errors } = await amplifyClient.queries.askBedrock({
-        ingredients: [formData.get("ingredients")?.toString() || ""],
+      const imageInput = formData.get("image") as File;
+      const question = formData.get("question") as string;
+
+      // Convert image to base64
+      const imageBase64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          resolve(base64String.split(',')[1]); // Remove the data URL prefix
+        };
+        reader.readAsDataURL(imageInput);
       });
 
-      if (!errors) {
-        setResult(data?.body || "No data returned");
-      } else {
-        console.log(errors);
-      }
+      const { data, errors } = await amplifyClient.queries.askBedrock({
+        imageBase64,
+        question: question || "What's in this image?"
+      });
 
-  
+      if (errors) {
+        setResult(`Error: ${errors.map(e => e.message).join(', ')}`);
+      } else {
+        setResult(data?.body || "No response received");
+      }
     } catch (e) {
-      alert(`An error occurred: ${e}`);
+      setResult(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setLoading(false);
     }
