@@ -99,3 +99,16 @@
   font-weight: bold;
   text-align: left; /* Align text to the left */
 }
+
+.error {
+  background-color: #fee;
+  border: 1px solid #f88;
+  border-radius: 4px;
+  padding: 15px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #d00;
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 15px;
+}

@@ -10,11 +10,9 @@ const schema = a.schema({
     .query()
     .arguments({ 
       ingredients: a.string().array().required(),
-      imageBase64: a.string(),
       question: a.string()
     })
     .returns(a.ref("BedrockResponse"))
-    .authorization((allow) => [allow.authenticated()])
     .handler(
       a.handler.custom({ entry: "./bedrock.js", dataSource: "bedrockDS" })
     ),

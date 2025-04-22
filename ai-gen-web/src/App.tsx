@@ -12,37 +12,50 @@ import "@aws-amplify/ui-react/styles.css";
 Amplify.configure(outputs);
 
 const amplifyClient = generateClient<Schema>({
-  authMode: "userPool",
+  authMode: "apiKey",
 });
 
 function App() {
   const [result, setResult] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
+    setError("");
+    setResult("");
 
     try {
       const formData = new FormData(event.currentTarget);
       const ingredientsString = formData.get("ingredients")?.toString() || "";
       const ingredientsList = ingredientsString.split(',').map(i => i.trim()).filter(i => i.length > 0);
       
+      console.log("Submitting request with ingredients:", ingredientsList);
+      
       const { data, errors } = await amplifyClient.queries.askBedrock({
         ingredients: ingredientsList,
-        imageBase64: "",
         question: ""
       });
 
+      console.log("Response received:", data, "Errors:", errors);
+
       if (!errors) {
-        setResult(data?.body || "No data returned");
+        if (data?.error) {
+          console.error("Error from backend:", data.error);
+          setError(data.error);
+        } else if (data?.body) {
+          setResult(data.body);
+        } else {
+          setError("No data returned from the model");
+        }
       } else {
-        console.error(errors);
-        setResult("An error occurred while generating the recipe");
+        console.error("GraphQL errors:", errors);
+        setError(errors.map(e => e.message).join(", "));
       }
     } catch (e) {
-      console.error(e);
-      setResult("An error occurred while generating the recipe");
+      console.error("Exception during request:", e);
+      setError(`An error occurred: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setLoading(false);
     }
@@ -86,7 +99,10 @@ function App() {
             <Placeholder size="large" />
           </div>
         ) : (
-          result && <p className="result">{result}</p>
+          <>
+            {error && <p className="error">{error}</p>}
+            {result && <p className="result">{result}</p>}
+          </>
         )}
       </div>
     </div>
